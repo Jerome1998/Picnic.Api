@@ -65,4 +65,3 @@ public sealed class PicnicApiOptions
         return $"https://storefront-prod.{this.CountryCode.ToLowerInvariant()}.picnicinternational.com/api/{this.ApiVersion}";
     }
 }
-

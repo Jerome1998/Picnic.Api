@@ -1,5 +1,7 @@
 # Picnic.Api
 
+![NuGet Version](https://img.shields.io/nuget/v/Picnic.Api)
+
 A C# wrapper for the unofficial [Picnic](https://picnic.app/) API.
 
 This library is based on the Node.js library [picnic-api](https://github.com/MRVDH/picnic-api) and on the Python library [python-picnic-api](https://github.com/MikeBrink/python-picnic-api).
