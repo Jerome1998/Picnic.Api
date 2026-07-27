@@ -62,6 +62,14 @@ public sealed class PicnicApiOptions
             return this.BaseUrl.TrimEnd('/');
         }
 
-        return $"https://storefront-prod.{this.CountryCode.ToLowerInvariant()}.picnicinternational.com/api/{this.ApiVersion}";
+        string countryCode = string.IsNullOrWhiteSpace(this.CountryCode)
+            ? DefaultCountryCode
+            : this.CountryCode.Trim();
+
+        string apiVersion = string.IsNullOrWhiteSpace(this.ApiVersion)
+            ? DefaultApiVersion
+            : this.ApiVersion.Trim();
+
+        return $"https://storefront-prod.{countryCode.ToLowerInvariant()}.picnicinternational.com/api/{apiVersion}";
     }
 }
