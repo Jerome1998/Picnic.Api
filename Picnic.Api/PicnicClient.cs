@@ -24,14 +24,14 @@ public sealed class PicnicClient : IDisposable
 
         _httpClient = new PicnicHttpClient(options, httpMessageHandler);
 
-        Auth = new AuthService(_httpClient);
-        App = new AppService(_httpClient);
-        User = new UserService(_httpClient);
-        Catalog = new CatalogService(_httpClient);
-        Cart = new CartService(_httpClient);
-        Delivery = new DeliveryService(_httpClient);
-        Payment = new PaymentService(_httpClient);
-        Consent = new ConsentService(_httpClient);
+        this.Auth = new AuthService(_httpClient);
+        this.App = new AppService(_httpClient);
+        this.User = new UserService(_httpClient);
+        this.Catalog = new CatalogService(_httpClient);
+        this.Cart = new CartService(_httpClient);
+        this.Delivery = new DeliveryService(_httpClient);
+        this.Payment = new PaymentService(_httpClient);
+        this.Consent = new ConsentService(_httpClient);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public sealed class PicnicClient : IDisposable
     /// <param name="cancellationToken">A token to cancel the authentication request.</param>
     /// <returns>The login result containing authentication details.</returns>
     public Task<LoginResult> LoginAsync(string username, string password, CancellationToken cancellationToken = default)
-        => Auth.LoginAsync(username, password, cancellationToken);
+        => this.Auth.LoginAsync(username, password, cancellationToken);
 
     /// <summary>
     /// Releases resources used by the client.

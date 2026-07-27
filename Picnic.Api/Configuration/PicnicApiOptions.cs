@@ -26,6 +26,26 @@ public sealed class PicnicApiOptions
     public string ApiVersion { get; init; } = DefaultApiVersion;
 
     /// <summary>
+    /// The default value used for the <c>x-picnic-agent</c> request header.
+    /// </summary>
+    public const string DefaultPicnicAgent = "30100;1.228.1-15480;";
+
+    /// <summary>
+    /// The default value used for the <c>x-picnic-did</c> request header.
+    /// </summary>
+    public const string DefaultPicnicDid = "3C417201548B2E3B";
+
+    /// <summary>
+    /// Gets the value used for the <c>x-picnic-agent</c> request header.
+    /// </summary>
+    public string PicnicAgent { get; init; } = DefaultPicnicAgent;
+
+    /// <summary>
+    /// Gets the value used for the <c>x-picnic-did</c> request header.
+    /// </summary>
+    public string PicnicDid { get; init; } = DefaultPicnicDid;
+
+    /// <summary>
     /// Gets the initial authentication token.
     /// </summary>
     public string? AuthToken { get; init; }
@@ -37,12 +57,12 @@ public sealed class PicnicApiOptions
 
     internal string ResolveBaseUrl()
     {
-        if (!string.IsNullOrWhiteSpace(BaseUrl))
+        if (!string.IsNullOrWhiteSpace(this.BaseUrl))
         {
-            return BaseUrl.TrimEnd('/');
+            return this.BaseUrl.TrimEnd('/');
         }
 
-        return $"https://storefront-prod.{CountryCode.ToLowerInvariant()}.picnicinternational.com/api/{ApiVersion}";
+        return $"https://storefront-prod.{this.CountryCode.ToLowerInvariant()}.picnicinternational.com/api/{this.ApiVersion}";
     }
 }
 

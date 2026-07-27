@@ -9,58 +9,65 @@ namespace Picnic.Api.Internal;
 
 internal sealed class PicnicHttpClient : IDisposable
 {
-    private const string AuthHeader = "x-picnic-auth";
+    private const string AUTH_HEADER = "x-picnic-auth";
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
-    private readonly string _countryCode;
+    private readonly string _picnicAgent;
+    private readonly string _picnicDid;
 
     public PicnicHttpClient(PicnicApiOptions options, HttpMessageHandler? httpMessageHandler = null)
     {
-        _countryCode = options.CountryCode;
+        string countryCode = options.CountryCode;
         _baseUrl = options.ResolveBaseUrl();
-        AuthToken = options.AuthToken;
+        _picnicAgent = options.PicnicAgent;
+        _picnicDid = options.PicnicDid;
+        this.AuthToken = options.AuthToken;
 
         _httpClient = httpMessageHandler is null ? new HttpClient() : new HttpClient(httpMessageHandler);
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("okhttp/4.9.0");
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", _countryCode.Equals("DE", StringComparison.OrdinalIgnoreCase) ? "de" : "nl");
 
-        if (!string.IsNullOrWhiteSpace(AuthToken))
+        string acceptLanguage = string.IsNullOrWhiteSpace(countryCode)
+            ? PicnicApiOptions.DefaultCountryCode.ToLowerInvariant()
+            : countryCode.Trim().ToLowerInvariant();
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", acceptLanguage);
+
+        if (!string.IsNullOrWhiteSpace(this.AuthToken))
         {
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(AuthHeader, AuthToken);
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(AUTH_HEADER, this.AuthToken);
         }
     }
 
-    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(AuthToken);
+    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(this.AuthToken);
 
     public string? AuthToken { get; private set; }
 
     public async Task<PicnicApiResponse> GetAsync(string path, bool includePicnicHeaders = false, CancellationToken cancellationToken = default)
     {
-        using var request = CreateRequest(HttpMethod.Get, path, includePicnicHeaders);
-        return await SendForJsonAsync(request, cancellationToken);
+        using var request = this.CreateRequest(HttpMethod.Get, path, includePicnicHeaders);
+        return await this.SendForJsonAsync(request, cancellationToken);
     }
 
     public async Task<PicnicApiResponse> PostAsync(string path, object? body = null, bool includePicnicHeaders = false, CancellationToken cancellationToken = default)
     {
-        using var request = CreateRequest(HttpMethod.Post, path, includePicnicHeaders, body);
-        return await SendForJsonAsync(request, cancellationToken);
+        using var request = this.CreateRequest(HttpMethod.Post, path, includePicnicHeaders, body);
+        return await this.SendForJsonAsync(request, cancellationToken);
     }
 
     public async Task<PicnicApiResponse> PutAsync(string path, object? body = null, bool includePicnicHeaders = false, CancellationToken cancellationToken = default)
     {
-        using var request = CreateRequest(HttpMethod.Put, path, includePicnicHeaders, body);
-        return await SendForJsonAsync(request, cancellationToken);
+        using var request = this.CreateRequest(HttpMethod.Put, path, includePicnicHeaders, body);
+        return await this.SendForJsonAsync(request, cancellationToken);
     }
 
     public async Task<byte[]> GetBytesAsync(string absoluteOrRelativePath, CancellationToken cancellationToken = default)
     {
         string uri = absoluteOrRelativePath.StartsWith("http", StringComparison.OrdinalIgnoreCase)
             ? absoluteOrRelativePath
-            : BuildUrl(absoluteOrRelativePath);
+            : this.BuildUrl(absoluteOrRelativePath);
 
         using var response = await _httpClient.GetAsync(uri, cancellationToken);
-        UpdateAuthFromResponse(response);
+        this.UpdateAuthFromResponse(response);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -79,12 +86,12 @@ internal sealed class PicnicHttpClient : IDisposable
 
     private HttpRequestMessage CreateRequest(HttpMethod method, string path, bool includePicnicHeaders, object? body = null)
     {
-        var request = new HttpRequestMessage(method, BuildUrl(path));
+        var request = new HttpRequestMessage(method, this.BuildUrl(path));
 
         if (includePicnicHeaders)
         {
-            request.Headers.TryAddWithoutValidation("x-picnic-agent", "30100;1.228.1-15480;");
-            request.Headers.TryAddWithoutValidation("x-picnic-did", "3C417201548B2E3B");
+            request.Headers.TryAddWithoutValidation("x-picnic-agent", _picnicAgent);
+            request.Headers.TryAddWithoutValidation("x-picnic-did", _picnicDid);
         }
 
         if (body is not null)
@@ -99,7 +106,7 @@ internal sealed class PicnicHttpClient : IDisposable
     private async Task<PicnicApiResponse> SendForJsonAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         using var response = await _httpClient.SendAsync(request, cancellationToken);
-        UpdateAuthFromResponse(response);
+        this.UpdateAuthFromResponse(response);
 
         string payload = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -180,21 +187,21 @@ internal sealed class PicnicHttpClient : IDisposable
 
     private void UpdateAuthFromResponse(HttpResponseMessage response)
     {
-        if (!response.Headers.TryGetValues(AuthHeader, out var values))
+        if (!response.Headers.TryGetValues(AUTH_HEADER, out var values))
         {
             return;
         }
 
         string? token = values.FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(token) || string.Equals(token, AuthToken, StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(token) || string.Equals(token, this.AuthToken, StringComparison.Ordinal))
         {
             return;
         }
 
-        AuthToken = token;
+        this.AuthToken = token;
 
-        _httpClient.DefaultRequestHeaders.Remove(AuthHeader);
-        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(AuthHeader, token);
+        _httpClient.DefaultRequestHeaders.Remove(AUTH_HEADER);
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(AUTH_HEADER, token);
     }
 
     private string BuildUrl(string path)

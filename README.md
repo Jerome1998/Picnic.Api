@@ -35,7 +35,7 @@ var login = await client.LoginAsync("your-email-or-phone", "your-password");
 
 if (login.SecondFactorAuthenticationRequired)
 {
-  await client.Auth.Generate2FaCodeAsync(Picnic.Api.Models.Auth.TwoFactorChannel.EMAIL);
+  await client.Auth.Generate2FaCodeAsync(Picnic.Api.Models.Auth.TwoFactorChannel.Email);
   // Ask the user for the code received by email/sms.
   await client.Auth.Verify2FaCodeAsync("123456");
 }
