@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Picnic.Api</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Jerome1998/Picnic.Api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Jerome1998/Picnic.Api</RepositoryUrl>
+    <Authors>Jerome1998</Authors>
+    <Description>An unofficial C# wrapper for the Picnic grocery online store.</Description>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>picnic;api</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
+
