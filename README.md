@@ -1,9 +1,10 @@
 # Picnic.Api
 
-An unofficial C# wrapper for the [Picnic](https://picnic.app/) grocery online store.
+A C# wrapper for the unofficial [Picnic](https://picnic.app/) API.
 
 This library is based on the Node.js library [picnic-api](https://github.com/MRVDH/picnic-api) and on the Python library [python-picnic-api](https://github.com/MikeBrink/python-picnic-api).
-It is completely vibe coded based on the mentioned libraries.
+This library is inspired by the mentioned projects and adapted for C#.
+
 This API is unofficial and is not affiliated with Picnic in any way.
 
 ## Getting Started
@@ -60,3 +61,11 @@ var client = new PicnicClient(new PicnicApiOptions
   CountryCode = "DE"
 });
 ```
+
+## Disclaimer
+
+Use this library at your own risk.
+
+You are fully responsible for how you use this project and for complying with Picnic terms, policies, and applicable laws.
+
+You are responsible for your own use of this library, including any account limitations, warnings, temporary suspensions, permanent bans, data loss, or any other consequences that may result.
