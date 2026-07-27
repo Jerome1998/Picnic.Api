@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/Jerome1998/Picnic.Api</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Jerome1998/Picnic.Api</RepositoryUrl>
     <Authors>Jerome1998</Authors>
-    <Description>An unofficial C# wrapper for the Picnic grocery online store.</Description>
+    <Description>A C# wrapper for the unofficial Picnic API.</Description>
     <RepositoryType>git</RepositoryType>
     <PackageTags>picnic;api</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
