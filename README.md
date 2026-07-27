@@ -1,6 +1,6 @@
 # Picnic.Api
 
-![NuGet Version](https://img.shields.io/nuget/v/Picnic.Api)
+[![NuGet](https://img.shields.io/nuget/v/Picnic.Api.svg)](https://nuget.org/packages/Picnic.Api)
 
 A C# wrapper for the unofficial [Picnic](https://picnic.app/) API.
 
