@@ -64,6 +64,12 @@ var client = new PicnicClient(new PicnicApiOptions
 });
 ```
 
+## Contributing
+
+Contributions are welcome.
+
+If you find a bug, have an idea for improvement, or want to add a feature, feel free to open an issue or submit a pull request.
+
 ## Disclaimer
 
 Use this library at your own risk.
