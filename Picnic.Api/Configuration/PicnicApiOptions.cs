@@ -28,7 +28,7 @@ public sealed class PicnicApiOptions
     /// <summary>
     /// The default value used for the <c>x-picnic-agent</c> request header.
     /// </summary>
-    public const string DefaultPicnicAgent = "30100;1.228.1-15480;";
+    public const string DefaultPicnicAgent = "30100;1.236.1-15553;";
 
     /// <summary>
     /// The default value used for the <c>x-picnic-did</c> request header.
