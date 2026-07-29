@@ -3,211 +3,131 @@ using System.Text.Json.Serialization;
 namespace Picnic.Api.Models.Recipe;
 
 /// <summary>
-/// Represents a recipe in the Picnic catalog.
+/// Represents the request body for saving or unsaving a recipe.
+/// Both operations use the same endpoint; the <see cref="RecipeSavingPayload.SavedAt"/>
+/// field distinguishes them: an ISO 8601 timestamp saves the recipe, <c>null</c> unsaves it.
 /// </summary>
-public sealed class RecipeDetails
+public sealed class RecipeSavingRequest
 {
     /// <summary>
-    /// Gets the recipe identifier.
+    /// Gets the task payload.
     /// </summary>
-    [JsonPropertyName("id")]
-    public string? Id { get; init; }
-
-    /// <summary>
-    /// Gets the recipe title.
-    /// </summary>
-    [JsonPropertyName("title")]
-    public string? Title { get; init; }
-
-    /// <summary>
-    /// Gets the recipe description.
-    /// </summary>
-    [JsonPropertyName("description")]
-    public string? Description { get; init; }
-
-    /// <summary>
-    /// Gets the recipe image URL.
-    /// </summary>
-    [JsonPropertyName("image_url")]
-    public string? ImageUrl { get; init; }
-
-    /// <summary>
-    /// Gets the preparation time in minutes.
-    /// </summary>
-    [JsonPropertyName("preparation_time_minutes")]
-    public int? PreparationTimeMinutes { get; init; }
-
-    /// <summary>
-    /// Gets the cooking time in minutes.
-    /// </summary>
-    [JsonPropertyName("cooking_time_minutes")]
-    public int? CookingTimeMinutes { get; init; }
-
-    /// <summary>
-    /// Gets the number of servings.
-    /// </summary>
-    [JsonPropertyName("servings")]
-    public int? Servings { get; init; }
-
-    /// <summary>
-    /// Gets the difficulty level (e.g., "easy", "medium", "hard").
-    /// </summary>
-    [JsonPropertyName("difficulty")]
-    public string? Difficulty { get; init; }
-
-    /// <summary>
-    /// Gets the recipe ingredients.
-    /// </summary>
-    [JsonPropertyName("ingredients")]
-    public IReadOnlyList<RecipeIngredient>? Ingredients { get; init; }
-
-    /// <summary>
-    /// Gets the recipe instructions.
-    /// </summary>
-    [JsonPropertyName("instructions")]
-    public string? Instructions { get; init; }
-
-    /// <summary>
-    /// Gets the recipe tags or categories.
-    /// </summary>
-    [JsonPropertyName("tags")]
-    public IReadOnlyList<string>? Tags { get; init; }
-
-    /// <summary>
-    /// Gets whether the recipe is saved by the user.
-    /// </summary>
-    [JsonPropertyName("is_saved")]
-    public bool? IsSaved { get; init; }
+    [JsonPropertyName("payload")]
+    public required RecipeSavingPayload Payload { get; init; }
 }
 
 /// <summary>
-/// Represents an ingredient in a recipe.
+/// Represents the payload for a recipe save/unsave task.
 /// </summary>
-public sealed class RecipeIngredient
+public sealed class RecipeSavingPayload
 {
     /// <summary>
-    /// Gets the ingredient name.
-    /// </summary>
-    [JsonPropertyName("name")]
-    public string? Name { get; init; }
-
-    /// <summary>
-    /// Gets the ingredient quantity.
-    /// </summary>
-    [JsonPropertyName("quantity")]
-    public decimal? Quantity { get; init; }
-
-    /// <summary>
-    /// Gets the ingredient unit of measurement.
-    /// </summary>
-    [JsonPropertyName("unit")]
-    public string? Unit { get; init; }
-
-    /// <summary>
-    /// Gets the product identifier for the ingredient, if available.
-    /// </summary>
-    [JsonPropertyName("product_id")]
-    public string? ProductId { get; init; }
-}
-
-/// <summary>
-/// Represents a recipe summary in a list.
-/// </summary>
-public sealed class RecipeSummary
-{
-    /// <summary>
-    /// Gets the recipe identifier.
-    /// </summary>
-    [JsonPropertyName("id")]
-    public string? Id { get; init; }
-
-    /// <summary>
-    /// Gets the recipe title.
-    /// </summary>
-    [JsonPropertyName("title")]
-    public string? Title { get; init; }
-
-    /// <summary>
-    /// Gets the recipe image URL.
-    /// </summary>
-    [JsonPropertyName("image_url")]
-    public string? ImageUrl { get; init; }
-
-    /// <summary>
-    /// Gets the recipe difficulty level.
-    /// </summary>
-    [JsonPropertyName("difficulty")]
-    public string? Difficulty { get; init; }
-
-    /// <summary>
-    /// Gets whether the recipe is saved by the user.
-    /// </summary>
-    [JsonPropertyName("is_saved")]
-    public bool? IsSaved { get; init; }
-}
-
-/// <summary>
-/// Represents a request to save a recipe.
-/// </summary>
-public sealed class SaveRecipeRequest
-{
-    /// <summary>
-    /// Gets or sets the recipe identifier.
+    /// Gets the recipe (selling group) identifier.
     /// </summary>
     [JsonPropertyName("recipe_id")]
-    public string? RecipeId { get; set; }
+    public required string RecipeId { get; init; }
+
+    /// <summary>
+    /// Gets the ISO 8601 timestamp at which the recipe was saved, or <c>null</c> to unsave.
+    /// </summary>
+    [JsonPropertyName("saved_at")]
+    public string? SavedAt { get; init; }
 }
 
 /// <summary>
-/// Represents a request to remove a saved recipe.
+/// Represents the request body for assigning a selling group (recipe) to the basket.
 /// </summary>
-public sealed class RemoveRecipeRequest
+public sealed class AssignSellingGroupRequest
 {
     /// <summary>
-    /// Gets or sets the recipe identifier.
+    /// Gets the task payload.
     /// </summary>
-    [JsonPropertyName("recipe_id")]
-    public string? RecipeId { get; set; }
+    [JsonPropertyName("payload")]
+    public required AssignSellingGroupPayload Payload { get; init; }
 }
 
 /// <summary>
-/// Represents the response for recipe browsing.
+/// Represents the payload for assigning a selling group to the basket.
 /// </summary>
-public sealed class RecipeBrowseResponse
+public sealed class AssignSellingGroupPayload
 {
     /// <summary>
-    /// Gets the list of recipes.
+    /// Gets the selling group (recipe) identifier.
     /// </summary>
-    [JsonPropertyName("recipes")]
-    public IReadOnlyList<RecipeSummary>? Recipes { get; init; }
+    [JsonPropertyName("selling_group_id")]
+    public required string SellingGroupId { get; init; }
 
     /// <summary>
-    /// Gets the total number of available recipes.
+    /// Gets the delivery day offset relative to the selected slot, if specified.
     /// </summary>
-    [JsonPropertyName("total")]
-    public int? Total { get; init; }
+    [JsonPropertyName("day_offset")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? DayOffset { get; init; }
 
     /// <summary>
-    /// Gets the pagination offset.
+    /// Gets the number of servings to assign, if specified.
     /// </summary>
-    [JsonPropertyName("offset")]
-    public int? Offset { get; init; }
-
-    /// <summary>
-    /// Gets the pagination limit.
-    /// </summary>
-    [JsonPropertyName("limit")]
-    public int? Limit { get; init; }
+    [JsonPropertyName("portions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Portions { get; init; }
 }
 
 /// <summary>
-/// Represents saved recipes response.
+/// Represents the request body for updating the number of portions of a selling group in the basket.
 /// </summary>
-public sealed class SavedRecipesResponse
+public sealed class UpdateSellingGroupPortionsRequest
 {
     /// <summary>
-    /// Gets the list of saved recipe identifiers.
+    /// Gets the task payload.
     /// </summary>
-    [JsonPropertyName("saved_recipe_ids")]
-    public IReadOnlyList<string>? SavedRecipeIds { get; init; }
+    [JsonPropertyName("payload")]
+    public required UpdateSellingGroupPortionsPayload Payload { get; init; }
+}
+
+/// <summary>
+/// Represents the payload for updating the portions of a selling group.
+/// </summary>
+public sealed class UpdateSellingGroupPortionsPayload
+{
+    /// <summary>
+    /// Gets the selling group (recipe) identifier.
+    /// </summary>
+    [JsonPropertyName("selling_group_id")]
+    public required string SellingGroupId { get; init; }
+
+    /// <summary>
+    /// Gets the delivery day offset the recipe is planned for.
+    /// </summary>
+    [JsonPropertyName("day_offset")]
+    public int DayOffset { get; init; }
+
+    /// <summary>
+    /// Gets the new number of servings.
+    /// </summary>
+    [JsonPropertyName("portions")]
+    public int Portions { get; init; }
+}
+
+/// <summary>
+/// Represents the request body for removing a selling group (recipe) from the basket.
+/// </summary>
+public sealed class RemoveSellingGroupRequest
+{
+    /// <summary>
+    /// Gets the task payload.
+    /// </summary>
+    [JsonPropertyName("payload")]
+    public required RemoveSellingGroupPayload Payload { get; init; }
+}
+
+/// <summary>
+/// Represents the payload for removing a selling group from the basket.
+/// </summary>
+public sealed class RemoveSellingGroupPayload
+{
+    /// <summary>
+    /// Gets the selling group (recipe) identifier to remove.
+    /// </summary>
+    [JsonPropertyName("selling_group_id")]
+    public required string SellingGroupId { get; init; }
 }
