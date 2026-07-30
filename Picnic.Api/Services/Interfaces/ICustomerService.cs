@@ -3,91 +3,52 @@ using Picnic.Api.Models.CustomerService;
 namespace Picnic.Api.Services.Interfaces;
 
 /// <summary>
-/// Defines customer service operations including support tickets, messages, and reminders.
+/// Defines customer service operations.
 /// </summary>
 public interface ICustomerService
 {
     /// <summary>
-    /// Retrieves customer service contact information.
+    /// Returns customer service contact details and opening times.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The contact information.</returns>
-    Task<ContactInfo> GetContactInfoAsync(CancellationToken cancellationToken = default);
+    /// <returns>The customer service contact information.</returns>
+    Task<CustomerServiceContactInfo> GetContactInfoAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves support tickets for the current user.
+    /// Returns popup messages in the app, such as prompts, message-bar notifications, and order-confirmation cards.
     /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of tickets to return (default: 20).</param>
+    /// <param name="displayPositions">Optional filter values such as <c>PROMPT</c>, <c>MESSAGE_BAR</c>, <c>ORDER_CONFIRMATION</c>, or <c>STOREFRONT_DIALOG</c>.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of support tickets.</returns>
-    Task<SupportTicketsResponse> GetTicketsAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default);
+    /// <returns>The messages response wrapper.</returns>
+    Task<MessagesWrapper> GetMessagesAsync(IReadOnlyList<string>? displayPositions = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves a specific support ticket by identifier.
+    /// Returns the user's configured delivery reminders.
     /// </summary>
-    /// <param name="ticketId">The ticket identifier.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The support ticket details.</returns>
-    Task<SupportTicket> GetTicketAsync(string ticketId, CancellationToken cancellationToken = default);
+    /// <returns>The reminders response wrapper.</returns>
+    Task<RemindersWrapper> GetRemindersAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a new support ticket.
+    /// Replaces the user's configured delivery reminders.
     /// </summary>
-    /// <param name="subject">The ticket subject.</param>
-    /// <param name="description">The ticket description.</param>
-    /// <param name="priority">The priority level (e.g., "low", "medium", "high").</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The created support ticket.</returns>
-    Task<SupportTicket> CreateTicketAsync(string subject, string description, string priority = "medium", CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves service messages for the current user.
-    /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of messages to return (default: 20).</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of service messages.</returns>
-    Task<ServiceMessagesResponse> GetMessagesAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Adds a message/reply to a support ticket.
-    /// </summary>
-    /// <param name="ticketId">The ticket identifier.</param>
-    /// <param name="messageContent">The message content.</param>
+    /// <param name="reminders">The reminders to store.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task AddMessageAsync(string ticketId, string messageContent, CancellationToken cancellationToken = default);
+    Task SetRemindersAsync(IReadOnlyList<Reminder> reminders, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves service reminders for the current user.
+    /// Returns externally shipped parcels tracked via a carrier.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A list of service reminders.</returns>
-    Task<ServiceRemindersResponse> GetRemindersAsync(CancellationToken cancellationToken = default);
+    /// <returns>The tracked parcels.</returns>
+    Task<IReadOnlyList<Parcel>> GetParcelsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Marks a reminder as resolved.
+    /// Returns customer service contact info without requiring authentication.
     /// </summary>
-    /// <param name="reminderId">The reminder identifier.</param>
+    /// <param name="countryCode">The country code to pass in the <c>picnic-country</c> header.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task ResolveReminderAsync(string reminderId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves a list of parcels being shipped.
-    /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of parcels to return (default: 20).</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of parcels.</returns>
-    Task<ParcelsResponse> GetParcelsAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves tracking information for a specific parcel.
-    /// </summary>
-    /// <param name="parcelId">The parcel identifier.</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The parcel tracking information.</returns>
-    Task<Parcel> GetParcelAsync(string parcelId, CancellationToken cancellationToken = default);
+    /// <returns>The customer service contact information.</returns>
+    Task<CustomerServiceContactInfo> GetUnauthenticatedContactInfoAsync(string countryCode, CancellationToken cancellationToken = default);
 }

@@ -8,49 +8,16 @@ namespace Picnic.Api.Services.Interfaces;
 public interface IContentService
 {
     /// <summary>
-    /// Retrieves a static content page by identifier.
+    /// Returns the FAQ content page in PML format.
     /// </summary>
-    /// <param name="pageId">The content page identifier.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The content page details.</returns>
-    Task<ContentPage> GetPageAsync(string pageId, CancellationToken cancellationToken = default);
+    /// <returns>The FAQ content payload.</returns>
+    Task<ContentPml> GetFaqContentAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the FAQ content organized by categories.
+    /// Returns the content shown on the search empty-state screen in PML format.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>FAQ categories and items.</returns>
-    Task<FaqResponse> GetFaqAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves a specific FAQ item by identifier.
-    /// </summary>
-    /// <param name="faqItemId">The FAQ item identifier.</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The FAQ item details.</returns>
-    Task<FaqItem> GetFaqItemAsync(string faqItemId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves the search empty state content.
-    /// </summary>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>Search empty state content.</returns>
-    Task<SearchEmptyStateContent> GetSearchEmptyStateAsync(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves a list of blog posts.
-    /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of posts to return (default: 10).</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of blog posts.</returns>
-    Task<BlogPostListResponse> GetBlogPostsAsync(int offset = 0, int limit = 10, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retrieves a specific blog post by identifier.
-    /// </summary>
-    /// <param name="postId">The blog post identifier.</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The blog post details.</returns>
-    Task<BlogPost> GetBlogPostAsync(string postId, CancellationToken cancellationToken = default);
+    /// <returns>The search empty-state content payload.</returns>
+    Task<ContentPml> GetSearchEmptyStateAsync(CancellationToken cancellationToken = default);
 }

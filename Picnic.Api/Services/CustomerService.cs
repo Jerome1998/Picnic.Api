@@ -1,133 +1,87 @@
 using Picnic.Api.Internal;
+using Picnic.Api.Models;
 using Picnic.Api.Models.CustomerService;
 using Picnic.Api.Services.Interfaces;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace Picnic.Api.Services;
 
 internal sealed class CustomerService(PicnicHttpClient httpClient) : ICustomerService
 {
     /// <summary>
-    /// Retrieves customer service contact information.
+    /// Returns customer service contact details and opening times.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The contact information.</returns>
-    public async Task<ContactInfo> GetContactInfoAsync(CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            "/customer-service/contact-info",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<ContactInfo>();
+    /// <returns>The customer service contact information.</returns>
+    public async Task<CustomerServiceContactInfo> GetContactInfoAsync(CancellationToken cancellationToken = default)
+        => (await httpClient.GetAsync("/cs-contact-info", includePicnicHeaders: true, cancellationToken: cancellationToken))
+            .DeserializeOrThrow<CustomerServiceContactInfo>();
 
     /// <summary>
-    /// Retrieves support tickets for the current user.
+    /// Returns popup messages in the app.
     /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of tickets to return (default: 20).</param>
+    /// <param name="displayPositions">Optional display position filters.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of support tickets.</returns>
-    public async Task<SupportTicketsResponse> GetTicketsAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            $"/customer-service/tickets?offset={offset}&limit={limit}",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<SupportTicketsResponse>();
-
-    /// <summary>
-    /// Retrieves a specific support ticket by identifier.
-    /// </summary>
-    /// <param name="ticketId">The ticket identifier.</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The support ticket details.</returns>
-    public async Task<SupportTicket> GetTicketAsync(string ticketId, CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            $"/customer-service/tickets/{Uri.EscapeDataString(ticketId)}",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<SupportTicket>();
-
-    /// <summary>
-    /// Creates a new support ticket.
-    /// </summary>
-    /// <param name="subject">The ticket subject.</param>
-    /// <param name="description">The ticket description.</param>
-    /// <param name="priority">The priority level (e.g., "low", "medium", "high").</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The created support ticket.</returns>
-    public async Task<SupportTicket> CreateTicketAsync(string subject, string description, string priority = "medium", CancellationToken cancellationToken = default)
+    /// <returns>The messages response wrapper.</returns>
+    public async Task<MessagesWrapper> GetMessagesAsync(IReadOnlyList<string>? displayPositions = null, CancellationToken cancellationToken = default)
     {
-        var request = new CreateSupportTicketRequest
+        string query = string.Empty;
+        if (displayPositions is { Count: > 0 })
         {
-            Subject = subject,
-            Description = description,
-            Priority = priority
-        };
-        return (await httpClient.PostAsync("/customer-service/tickets", request, cancellationToken: cancellationToken))
-            .DeserializeOrThrow<SupportTicket>();
+            query = "?" + string.Join("&", displayPositions.Select(static p => $"display_position={Uri.EscapeDataString(p)}"));
+        }
+
+        return (await httpClient.GetAsync($"/messages{query}", includePicnicHeaders: true, cancellationToken: cancellationToken))
+            .DeserializeOrThrow<MessagesWrapper>();
     }
 
     /// <summary>
-    /// Retrieves service messages for the current user.
+    /// Returns the user's configured delivery reminders.
     /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of messages to return (default: 20).</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of service messages.</returns>
-    public async Task<ServiceMessagesResponse> GetMessagesAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            $"/customer-service/messages?offset={offset}&limit={limit}",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<ServiceMessagesResponse>();
+    /// <returns>The reminders response wrapper.</returns>
+    public async Task<RemindersWrapper> GetRemindersAsync(CancellationToken cancellationToken = default)
+        => (await httpClient.GetAsync("/reminders", includePicnicHeaders: true, cancellationToken: cancellationToken))
+            .DeserializeOrThrow<RemindersWrapper>();
 
     /// <summary>
-    /// Adds a message/reply to a support ticket.
+    /// Replaces the user's configured delivery reminders.
     /// </summary>
-    /// <param name="ticketId">The ticket identifier.</param>
-    /// <param name="messageContent">The message content.</param>
+    /// <param name="reminders">The reminders to store.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task AddMessageAsync(string ticketId, string messageContent, CancellationToken cancellationToken = default)
+    public async Task SetRemindersAsync(IReadOnlyList<Reminder> reminders, CancellationToken cancellationToken = default)
     {
-        var request = new { message = messageContent };
-        await httpClient.PostAsync($"/customer-service/tickets/{Uri.EscapeDataString(ticketId)}/messages", request, cancellationToken: cancellationToken);
+        await httpClient.PutAsync("/reminders", reminders, includePicnicHeaders: true, cancellationToken: cancellationToken);
     }
 
     /// <summary>
-    /// Retrieves service reminders for the current user.
+    /// Returns externally shipped parcels tracked via a carrier.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A list of service reminders.</returns>
-    public async Task<ServiceRemindersResponse> GetRemindersAsync(CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            "/customer-service/reminders",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<ServiceRemindersResponse>();
+    /// <returns>The tracked parcels.</returns>
+    public async Task<IReadOnlyList<Parcel>> GetParcelsAsync(CancellationToken cancellationToken = default)
+        => (await httpClient.GetAsync("/parcels", includePicnicHeaders: true, cancellationToken: cancellationToken))
+            .DeserializeOrThrow<IReadOnlyList<Parcel>>();
 
     /// <summary>
-    /// Marks a reminder as resolved.
+    /// Returns customer service contact info without requiring authentication.
     /// </summary>
-    /// <param name="reminderId">The reminder identifier.</param>
+    /// <param name="countryCode">The country code to pass in the picnic-country header.</param>
     /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task ResolveReminderAsync(string reminderId, CancellationToken cancellationToken = default)
+    /// <returns>The customer service contact information.</returns>
+    public async Task<CustomerServiceContactInfo> GetUnauthenticatedContactInfoAsync(string countryCode, CancellationToken cancellationToken = default)
     {
-        await httpClient.PostAsync(
-            $"/customer-service/reminders/{Uri.EscapeDataString(reminderId)}/resolve",
-            new object(),
-            cancellationToken: cancellationToken);
+        using var client = new HttpClient();
+        using var request = new HttpRequestMessage(HttpMethod.Get, httpClient.BuildPublicUrl("/cs-contact-info"));
+        request.Headers.TryAddWithoutValidation("picnic-country", countryCode);
+
+        using var response = await client.SendAsync(request, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        string payload = await response.Content.ReadAsStringAsync(cancellationToken);
+        using var document = JsonDocument.Parse(payload);
+        return new PicnicApiResponse(document.RootElement.Clone()).DeserializeOrThrow<CustomerServiceContactInfo>();
     }
-
-    /// <summary>
-    /// Retrieves a list of parcels being shipped.
-    /// </summary>
-    /// <param name="offset">The pagination offset (default: 0).</param>
-    /// <param name="limit">The maximum number of parcels to return (default: 20).</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>A paginated list of parcels.</returns>
-    public async Task<ParcelsResponse> GetParcelsAsync(int offset = 0, int limit = 20, CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            $"/customer-service/parcels?offset={offset}&limit={limit}",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<ParcelsResponse>();
-
-    /// <summary>
-    /// Retrieves tracking information for a specific parcel.
-    /// </summary>
-    /// <param name="parcelId">The parcel identifier.</param>
-    /// <param name="cancellationToken">A token to cancel the request.</param>
-    /// <returns>The parcel tracking information.</returns>
-    public async Task<Parcel> GetParcelAsync(string parcelId, CancellationToken cancellationToken = default)
-        => (await httpClient.GetAsync(
-            $"/customer-service/parcels/{Uri.EscapeDataString(parcelId)}",
-            cancellationToken: cancellationToken)).DeserializeOrThrow<Parcel>();
 }

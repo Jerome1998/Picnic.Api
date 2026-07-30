@@ -1,339 +1,238 @@
+using Picnic.Api.Models.Fusion;
 using System.Text.Json.Serialization;
 
 namespace Picnic.Api.Models.CustomerService;
 
 /// <summary>
-/// Represents customer service contact information.
+/// Represents an opening time window for a specific date.
 /// </summary>
-public sealed class ContactInfo
+public sealed class OpeningTime
 {
     /// <summary>
-    /// Gets the phone number for customer support.
+    /// Gets the start time as <c>[hour, minute]</c>.
     /// </summary>
-    [JsonPropertyName("phone")]
-    public string? Phone { get; init; }
+    [JsonPropertyName("start")]
+    public IReadOnlyList<int>? Start { get; init; }
 
     /// <summary>
-    /// Gets the email address for customer support.
+    /// Gets the end time as <c>[hour, minute]</c>.
+    /// </summary>
+    [JsonPropertyName("end")]
+    public IReadOnlyList<int>? End { get; init; }
+}
+
+/// <summary>
+/// Represents customer service contact details.
+/// </summary>
+public sealed class ContactDetails
+{
+    /// <summary>
+    /// Gets the support email address.
     /// </summary>
     [JsonPropertyName("email")]
     public string? Email { get; init; }
 
     /// <summary>
-    /// Gets the chat URL for live support.
+    /// Gets the support phone number.
     /// </summary>
-    [JsonPropertyName("chat_url")]
-    public string? ChatUrl { get; init; }
+    [JsonPropertyName("phone")]
+    public string? Phone { get; init; }
 
     /// <summary>
-    /// Gets the website URL for support documentation.
+    /// Gets the support WhatsApp number.
     /// </summary>
-    [JsonPropertyName("website_url")]
-    public string? WebsiteUrl { get; init; }
-
-    /// <summary>
-    /// Gets the support hours information.
-    /// </summary>
-    [JsonPropertyName("hours")]
-    public string? Hours { get; init; }
-
-    /// <summary>
-    /// Gets the country code for this contact information.
-    /// </summary>
-    [JsonPropertyName("country_code")]
-    public string? CountryCode { get; init; }
+    [JsonPropertyName("whatsapp")]
+    public string? Whatsapp { get; init; }
 }
 
 /// <summary>
-/// Represents a customer service message.
+/// Represents customer service contact info and opening times.
 /// </summary>
-public sealed class ServiceMessage
+public sealed class CustomerServiceContactInfo
 {
     /// <summary>
-    /// Gets the message identifier.
+    /// Gets the contact details.
     /// </summary>
-    [JsonPropertyName("id")]
-    public string? Id { get; init; }
+    [JsonPropertyName("contact_details")]
+    public ContactDetails? ContactDetails { get; init; }
 
     /// <summary>
-    /// Gets the message subject.
+    /// Gets opening times keyed by date string.
     /// </summary>
-    [JsonPropertyName("subject")]
-    public string? Subject { get; init; }
+    [JsonPropertyName("opening_times")]
+    public Dictionary<string, OpeningTime>? OpeningTimes { get; init; }
+}
+
+/// <summary>
+/// Represents the content payload of an in-app customer service message.
+/// </summary>
+public sealed class CustomerServiceMessageContent
+{
+    /// <summary>
+    /// Gets the PML version.
+    /// </summary>
+    [JsonPropertyName("pml_version")]
+    public string? PmlVersion { get; init; }
 
     /// <summary>
-    /// Gets the message content.
+    /// Gets the root Fusion component.
+    /// </summary>
+    [JsonPropertyName("component")]
+    public Component? Component { get; init; }
+
+    /// <summary>
+    /// Gets the image mapping used by the message.
+    /// </summary>
+    [JsonPropertyName("images")]
+    public Dictionary<string, string>? Images { get; init; }
+
+    /// <summary>
+    /// Gets message tracking attributes.
+    /// </summary>
+    [JsonPropertyName("tracking_attributes")]
+    public TrackingAttributes? TrackingAttributes { get; init; }
+}
+
+/// <summary>
+/// Represents a single in-app customer service message.
+/// </summary>
+public sealed class CustomerServiceMessage
+{
+    /// <summary>
+    /// Gets where in the app the message is shown.
+    /// </summary>
+    [JsonPropertyName("display_position")]
+    public string? DisplayPosition { get; init; }
+
+    /// <summary>
+    /// Gets the correlation identifier for the message send event.
+    /// </summary>
+    [JsonPropertyName("send_correlation_id")]
+    public string? SendCorrelationId { get; init; }
+
+    /// <summary>
+    /// Gets the sent time as a Unix timestamp in milliseconds.
+    /// </summary>
+    [JsonPropertyName("sent_time")]
+    public long SentTime { get; init; }
+
+    /// <summary>
+    /// Gets the expiry time as a Unix timestamp in milliseconds.
+    /// </summary>
+    [JsonPropertyName("expiry_time")]
+    public long ExpiryTime { get; init; }
+
+    /// <summary>
+    /// Gets the user identifier.
+    /// </summary>
+    [JsonPropertyName("user_id")]
+    public string? UserId { get; init; }
+
+    /// <summary>
+    /// Gets the target entity identifier, if any.
+    /// </summary>
+    [JsonPropertyName("target_entity_id")]
+    public string? TargetEntityId { get; init; }
+
+    /// <summary>
+    /// Gets the Fusion content payload.
     /// </summary>
     [JsonPropertyName("content")]
-    public string? Content { get; init; }
-
-    /// <summary>
-    /// Gets the sender identifier.
-    /// </summary>
-    [JsonPropertyName("sender_id")]
-    public string? SenderId { get; init; }
-
-    /// <summary>
-    /// Gets the timestamp when the message was sent.
-    /// </summary>
-    [JsonPropertyName("sent_at")]
-    public DateTime? SentAt { get; init; }
-
-    /// <summary>
-    /// Gets the message type (e.g., "ticket", "notification").
-    /// </summary>
-    [JsonPropertyName("type")]
-    public string? Type { get; init; }
-
-    /// <summary>
-    /// Gets the status of the message (e.g., "open", "closed").
-    /// </summary>
-    [JsonPropertyName("status")]
-    public string? Status { get; init; }
+    public CustomerServiceMessageContent? Content { get; init; }
 }
 
 /// <summary>
-/// Represents a customer service ticket.
+/// Wraps the response returned by the <c>/messages</c> endpoint.
 /// </summary>
-public sealed class SupportTicket
+public sealed class MessagesWrapper
 {
     /// <summary>
-    /// Gets the ticket identifier.
-    /// </summary>
-    [JsonPropertyName("id")]
-    public string? Id { get; init; }
-
-    /// <summary>
-    /// Gets the ticket number.
-    /// </summary>
-    [JsonPropertyName("ticket_number")]
-    public string? TicketNumber { get; init; }
-
-    /// <summary>
-    /// Gets the ticket subject.
-    /// </summary>
-    [JsonPropertyName("subject")]
-    public string? Subject { get; init; }
-
-    /// <summary>
-    /// Gets the ticket description.
-    /// </summary>
-    [JsonPropertyName("description")]
-    public string? Description { get; init; }
-
-    /// <summary>
-    /// Gets the ticket status.
-    /// </summary>
-    [JsonPropertyName("status")]
-    public string? Status { get; init; }
-
-    /// <summary>
-    /// Gets the priority level.
-    /// </summary>
-    [JsonPropertyName("priority")]
-    public string? Priority { get; init; }
-
-    /// <summary>
-    /// Gets the timestamp when the ticket was created.
-    /// </summary>
-    [JsonPropertyName("created_at")]
-    public DateTime? CreatedAt { get; init; }
-
-    /// <summary>
-    /// Gets the timestamp of the last update.
-    /// </summary>
-    [JsonPropertyName("updated_at")]
-    public DateTime? UpdatedAt { get; init; }
-
-    /// <summary>
-    /// Gets the list of messages in this ticket.
+    /// Gets the returned messages.
     /// </summary>
     [JsonPropertyName("messages")]
-    public IReadOnlyList<ServiceMessage>? Messages { get; init; }
+    public IReadOnlyList<CustomerServiceMessage>? Messages { get; init; }
+
+    /// <summary>
+    /// Gets the polling interval in milliseconds, if provided.
+    /// </summary>
+    [JsonPropertyName("query_interval")]
+    public int? QueryInterval { get; init; }
 }
 
 /// <summary>
-/// Represents a customer service reminder.
+/// Represents a single reminder configuration.
 /// </summary>
-public sealed class ServiceReminder
+public sealed class Reminder
 {
     /// <summary>
-    /// Gets the reminder identifier.
+    /// Gets the day of week value such as <c>MONDAY</c>, or <c>null</c>.
     /// </summary>
-    [JsonPropertyName("id")]
-    public string? Id { get; init; }
+    [JsonPropertyName("day_of_week")]
+    public string? DayOfWeek { get; init; }
 
     /// <summary>
-    /// Gets the reminder type (e.g., "order_issue", "delivery_delay").
+    /// Gets the time of day as <c>[hour, minute]</c>, or <c>null</c>.
     /// </summary>
-    [JsonPropertyName("type")]
-    public string? Type { get; init; }
-
-    /// <summary>
-    /// Gets the reminder message.
-    /// </summary>
-    [JsonPropertyName("message")]
-    public string? Message { get; init; }
-
-    /// <summary>
-    /// Gets the timestamp when the reminder was sent.
-    /// </summary>
-    [JsonPropertyName("sent_at")]
-    public DateTime? SentAt { get; init; }
-
-    /// <summary>
-    /// Gets whether the reminder has been acted upon.
-    /// </summary>
-    [JsonPropertyName("is_resolved")]
-    public bool? IsResolved { get; init; }
-
-    /// <summary>
-    /// Gets the related order or delivery ID if applicable.
-    /// </summary>
-    [JsonPropertyName("related_id")]
-    public string? RelatedId { get; init; }
+    [JsonPropertyName("time_of_day")]
+    public IReadOnlyList<int>? TimeOfDay { get; init; }
 }
 
 /// <summary>
-/// Represents a parcel for shipment.
+/// Wraps the response returned by the <c>/reminders</c> endpoint.
+/// </summary>
+public sealed class RemindersWrapper
+{
+    /// <summary>
+    /// Gets the configured reminders.
+    /// </summary>
+    [JsonPropertyName("reminders")]
+    public IReadOnlyList<Reminder>? Reminders { get; init; }
+}
+
+/// <summary>
+/// Represents the current status of a parcel.
+/// </summary>
+public sealed class ParcelCurrentStatus
+{
+    /// <summary>
+    /// Gets the parcel status value.
+    /// </summary>
+    [JsonPropertyName("status")]
+    public string? Status { get; init; }
+
+    /// <summary>
+    /// Gets the ISO 8601 timestamp for the current status.
+    /// </summary>
+    [JsonPropertyName("timestamp")]
+    public string? Timestamp { get; init; }
+}
+
+/// <summary>
+/// Represents an externally shipped parcel.
 /// </summary>
 public sealed class Parcel
 {
     /// <summary>
-    /// Gets the parcel identifier.
+    /// Gets the carrier tracking identifier.
     /// </summary>
     [JsonPropertyName("id")]
     public string? Id { get; init; }
 
     /// <summary>
-    /// Gets the tracking number.
+    /// Gets the carrier/handler name.
     /// </summary>
-    [JsonPropertyName("tracking_number")]
-    public string? TrackingNumber { get; init; }
+    [JsonPropertyName("handler_name")]
+    public string? HandlerName { get; init; }
 
     /// <summary>
-    /// Gets the carrier name (e.g., "DPD", "DHL").
+    /// Gets a value indicating whether the parcel is active.
     /// </summary>
-    [JsonPropertyName("carrier")]
-    public string? Carrier { get; init; }
+    [JsonPropertyName("active")]
+    public bool Active { get; init; }
 
     /// <summary>
-    /// Gets the current status of the parcel.
+    /// Gets the current parcel status.
     /// </summary>
-    [JsonPropertyName("status")]
-    public string? Status { get; init; }
-
-    /// <summary>
-    /// Gets the estimated delivery date.
-    /// </summary>
-    [JsonPropertyName("estimated_delivery_date")]
-    public DateTime? EstimatedDeliveryDate { get; init; }
-
-    /// <summary>
-    /// Gets the actual delivery date.
-    /// </summary>
-    [JsonPropertyName("delivered_at")]
-    public DateTime? DeliveredAt { get; init; }
-
-    /// <summary>
-    /// Gets the tracking URL to check parcel status.
-    /// </summary>
-    [JsonPropertyName("tracking_url")]
-    public string? TrackingUrl { get; init; }
-
-    /// <summary>
-    /// Gets the destination address.
-    /// </summary>
-    [JsonPropertyName("destination_address")]
-    public string? DestinationAddress { get; init; }
-}
-
-/// <summary>
-/// Represents a response containing service messages.
-/// </summary>
-public sealed class ServiceMessagesResponse
-{
-    /// <summary>
-    /// Gets the list of service messages.
-    /// </summary>
-    [JsonPropertyName("messages")]
-    public IReadOnlyList<ServiceMessage>? Messages { get; init; }
-
-    /// <summary>
-    /// Gets the total number of messages.
-    /// </summary>
-    [JsonPropertyName("total")]
-    public int? Total { get; init; }
-}
-
-/// <summary>
-/// Represents a response containing support tickets.
-/// </summary>
-public sealed class SupportTicketsResponse
-{
-    /// <summary>
-    /// Gets the list of support tickets.
-    /// </summary>
-    [JsonPropertyName("tickets")]
-    public IReadOnlyList<SupportTicket>? Tickets { get; init; }
-
-    /// <summary>
-    /// Gets the total number of tickets.
-    /// </summary>
-    [JsonPropertyName("total")]
-    public int? Total { get; init; }
-}
-
-/// <summary>
-/// Represents a response containing service reminders.
-/// </summary>
-public sealed class ServiceRemindersResponse
-{
-    /// <summary>
-    /// Gets the list of service reminders.
-    /// </summary>
-    [JsonPropertyName("reminders")]
-    public IReadOnlyList<ServiceReminder>? Reminders { get; init; }
-}
-
-/// <summary>
-/// Represents a response containing parcels.
-/// </summary>
-public sealed class ParcelsResponse
-{
-    /// <summary>
-    /// Gets the list of parcels.
-    /// </summary>
-    [JsonPropertyName("parcels")]
-    public IReadOnlyList<Parcel>? Parcels { get; init; }
-
-    /// <summary>
-    /// Gets the total number of parcels.
-    /// </summary>
-    [JsonPropertyName("total")]
-    public int? Total { get; init; }
-}
-
-/// <summary>
-/// Represents a request to create a support ticket.
-/// </summary>
-public sealed class CreateSupportTicketRequest
-{
-    /// <summary>
-    /// Gets or sets the ticket subject.
-    /// </summary>
-    [JsonPropertyName("subject")]
-    public string? Subject { get; set; }
-
-    /// <summary>
-    /// Gets or sets the ticket description.
-    /// </summary>
-    [JsonPropertyName("description")]
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Gets or sets the priority level.
-    /// </summary>
-    [JsonPropertyName("priority")]
-    public string? Priority { get; set; }
+    [JsonPropertyName("current_status")]
+    public ParcelCurrentStatus? CurrentStatus { get; init; }
 }

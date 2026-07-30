@@ -204,6 +204,12 @@ internal sealed class PicnicHttpClient : IDisposable
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(AUTH_HEADER, token);
     }
 
+    internal string BuildPublicUrl(string path)
+    {
+        string publicBaseUrl = _baseUrl.Replace("/api/", "/public-api/", StringComparison.OrdinalIgnoreCase);
+        return path.StartsWith('/') ? $"{publicBaseUrl}{path}" : $"{publicBaseUrl}/{path}";
+    }
+
     private string BuildUrl(string path)
     {
         if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase))
