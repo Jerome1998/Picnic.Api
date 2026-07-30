@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace Picnic.Api.Configuration;
 
 /// <summary>
@@ -54,6 +56,13 @@ public sealed class PicnicApiOptions
     /// Gets a custom API base URL. When not set, the default Picnic URL is derived from <see cref="CountryCode"/> and <see cref="ApiVersion"/>.
     /// </summary>
     public string? BaseUrl { get; init; }
+
+    /// <summary>
+    /// Generates a random Picnic Device ID (DID) for use in the <c>x-picnic-did</c> request header.
+    /// </summary>
+    /// <returns>A randomly generated Picnic Device ID.</returns>
+    public static string GenerateCustomPicnicDid() 
+        => Convert.ToHexString(RandomNumberGenerator.GetBytes(8));
 
     internal string ResolveBaseUrl()
     {
