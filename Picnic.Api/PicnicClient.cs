@@ -32,6 +32,10 @@ public sealed class PicnicClient : IDisposable
         this.Delivery = new DeliveryService(_httpClient);
         this.Payment = new PaymentService(_httpClient);
         this.Consent = new ConsentService(_httpClient);
+        this.Recipe = new RecipeService(_httpClient);
+        this.Content = new ContentService(_httpClient);
+        this.CustomerService = new CustomerService(_httpClient);
+        this.UserOnboarding = new UserOnboardingService(_httpClient);
     }
 
     /// <summary>
@@ -73,6 +77,26 @@ public sealed class PicnicClient : IDisposable
     /// Gets consent-related operations.
     /// </summary>
     public IConsentService Consent { get; }
+
+    /// <summary>
+    /// Gets recipe browsing and management operations.
+    /// </summary>
+    public IRecipeService Recipe { get; }
+
+    /// <summary>
+    /// Gets static content pages operations.
+    /// </summary>
+    public IContentService Content { get; }
+
+    /// <summary>
+    /// Gets customer service operations.
+    /// </summary>
+    public ICustomerService CustomerService { get; }
+
+    /// <summary>
+    /// Gets user onboarding operations.
+    /// </summary>
+    public IUserOnboardingService UserOnboarding { get; }
 
     /// <summary>
     /// Gets a value indicating whether the current client instance has an authentication token.
