@@ -2,13 +2,14 @@ using Picnic.Api.Internal;
 using Picnic.Api.Models;
 using Picnic.Api.Models.CustomerService;
 using Picnic.Api.Services.Interfaces;
-using System.Net.Http;
 using System.Text.Json;
 
 namespace Picnic.Api.Services;
 
 internal sealed class CustomerService(PicnicHttpClient httpClient) : ICustomerService
 {
+    private static readonly HttpClient Client = new();
+
     /// <summary>
     /// Returns customer service contact details and opening times.
     /// </summary>
@@ -73,11 +74,10 @@ internal sealed class CustomerService(PicnicHttpClient httpClient) : ICustomerSe
     /// <returns>The customer service contact information.</returns>
     public async Task<CustomerServiceContactInfo> GetUnauthenticatedContactInfoAsync(string countryCode, CancellationToken cancellationToken = default)
     {
-        using var client = new HttpClient();
         using var request = new HttpRequestMessage(HttpMethod.Get, httpClient.BuildPublicUrl("/cs-contact-info"));
         request.Headers.TryAddWithoutValidation("picnic-country", countryCode);
 
-        using var response = await client.SendAsync(request, cancellationToken);
+        using var response = await Client.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         string payload = await response.Content.ReadAsStringAsync(cancellationToken);
